@@ -78,7 +78,7 @@ def DownloadUrl(url, downloads_dir, timestamp_exactness, max_attempts=5, timeout
   # Get fileid and htmlid (where html content will be stored)
   fileid = url.replace("http://web.archive.org/web/", "")
   htmlfileid = fileid.replace("http://", "")
-  htmlfileid = fileid.replace("/", "-") + ".html"
+  htmlfileid = htmlfileid.replace("/", "-") + ".html"
   # print fileid
   
   # If html content has been saved previously then use that 
