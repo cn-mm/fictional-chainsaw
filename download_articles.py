@@ -235,8 +235,8 @@ def DownloadMode(urls_file, missing_urls_file, downloads_dir, request_parallelis
 
 def main():
   parser = argparse.ArgumentParser(description='Download BBC News Articles')
-  parser.add_argument('--urls_file', type=str, default="Sample.txt")
-  parser.add_argument('--missing_urls_file', type=str, default="Missing.txt")
+  parser.add_argument('--urls_file', type=str, default="./Sample.txt")
+  parser.add_argument('--missing_urls_file', type=str, default="./Missing.txt")
   parser.add_argument('--downloads_dir', type=str, default="./xsum-raw-downloads")
   parser.add_argument('--request_parallelism', type=int, default=200)
   parser.add_argument('--context_token_limit', type=int, default=2000)
