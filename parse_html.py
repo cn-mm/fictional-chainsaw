@@ -25,7 +25,7 @@ class ParseHtml:
   def __init__(self, story, corpus):
     self.story = story
     self.corpus = corpus
-    self.parser = html.HTMLParser(encoding=chardet.detect(self.story.html)['encoding'])
+    self.parser = html.HTMLParser(encoding="utf-8")
     self.tree = html.document_fromstring(self.story.html, parser=self.parser)
     
     # Elements to delete.
@@ -156,7 +156,7 @@ if __name__ == "__main__":
   for line in open(map_webarxiv_bbcid_file).readlines():
     data = line.strip().split()
     bbcids_dict[data[1]] = data[0]
-  print(len(bbcids_dict))
+  print("Length of bbcids dictionary: ", len(bbcids_dict))
 
   count = 0
 
