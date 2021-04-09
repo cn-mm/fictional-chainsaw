@@ -1,3 +1,17 @@
+# Copyright 2014 Google Inc. All Rights Reserved.
+# Modifications Copyright 2018 Shashi Narayan
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+#     http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 """
 Script for downloading XSum dataset.
@@ -6,8 +20,9 @@ Script for downloading XSum dataset.
 import os
 from collections import namedtuple
 from lxml import html
-import chardet 
+import chardet as chardet
 from itertools import chain
+import argparse
 
 RawStory = namedtuple('RawStory', 'url html')
 StoryTitle = namedtuple('StoryTitle', 'url title')
@@ -25,7 +40,10 @@ class ParseHtml:
   def __init__(self, story, corpus):
     self.story = story
     self.corpus = corpus
-    self.parser = html.HTMLParser(encoding="utf-8")
+    #encoding=chardet.detect(bytearray(self.story.html)['encoding'])
+    #print('e',encoding)
+    self.parser = html.HTMLParser(encoding='utf-8')
+    
     self.tree = html.document_fromstring(self.story.html, parser=self.parser)
     
     # Elements to delete.
@@ -78,16 +96,46 @@ class ParseHtml:
     xpaths = map(self.tree.xpath, selector)
     elements = list(chain.from_iterable(xpaths))
     paragraphs = [e.text_content().encode('utf-8') for e in elements]
-    paragraphs = map(str.strip, paragraphs)
+    #print('o',(paragraphs))
+    wob=paragraphs[0].decode()
+
+    paragraphs = map(str.strip, wob.split("/n"))
+    #paragraphs = map(str.strip, str(paragraphs))
+    
     paragraphs = [s for s in paragraphs if s and not str.isspace(s)]
     
     return paragraphs
+  '''
+  def getstory_content(self,type):
+    for selector in self.delete_selectors[self.corpus]:
 
+        for bad in self.tree.xpath(selector):
+             bad.getparent().remove(bad)
+    
+    print('p')
+    if type=='title':
+        content = self.ExtractText(self.title_selectors[self.corpus])
+    elif type=='intro':
+        content=self.ExtractText(self.introduction_selectors[self.corpus])
+    else:
+        content=self.ExtractText(self.restcontent_selectors[self.corpus])
+    return StoryTitle(self.story.url,content)
+  '''
   def getstory_title(self):
     for selector in self.delete_selectors[self.corpus]:
       for bad in self.tree.xpath(selector):
         bad.getparent().remove(bad)
+    #print('m')
+
     title = self.ExtractText(self.title_selectors[self.corpus])
+    #print('p',title)
+    #str1=""
+    ##for i in title:
+    #  if count!=0:
+    #    str1=str1+" "
+    # str1=str1+i
+    #  count=count+1
+    #print('t',str1)
     return StoryTitle(self.story.url, title)
 
   def getstory_introduction(self):
@@ -95,6 +143,8 @@ class ParseHtml:
       for bad in self.tree.xpath(selector):
         bad.getparent().remove(bad)
     introduction = self.ExtractText(self.introduction_selectors[self.corpus])
+    #print(type(introduction))
+   
     return StoryTitle(self.story.url, introduction)
     
   def getstory_restcontent(self):
@@ -102,6 +152,8 @@ class ParseHtml:
       for bad in self.tree.xpath(selector):
         bad.getparent().remove(bad)
     restcontent = self.ExtractText(self.restcontent_selectors[self.corpus])
+    
+    #print(str1) 
     return StoryRestContent(self.story.url, restcontent)
 
 ##############################################################
@@ -122,6 +174,7 @@ def GenerateMapper(t):
   
   # Extract title
   raw_story = RawStory(url, story_html)
+  
   story_title = ParseHtml(raw_story, corpus).getstory_title()
   # print story_title
 
@@ -144,19 +197,33 @@ def get_download_file_name(url):
   return htmlfileid
 
 if __name__ == "__main__":
+  '''parser = argparse.ArgumentParser(description='Parse html files')
+  parser.add_argument('--downloads_dir', type=str, default="./xsum-raw-downloads")
+  parser.add_argument('--bbc_id_file', type=str, default="./Sample_bbcid.txt")
+  parser.add_argument('--failed_id_file', type=str, default="xsum-extracts-from-downloads-failedIds.txt")
+  parser.add_argument('--results_dir', type=str, default="./xsum-extracts-from-downloads")
+  args = parser.parse_args()
+
+  download_dir = args.downloads_dir
+  map_webarxiv_bbcid_file = args.bbc_id_file
+  
+  result_dir =args.results_dir
+  os.system("mkdir -p "+result_dir)
+  failed_id_file = open(args.failed_id_file, "w")'''
   download_dir = "./xsum-raw-downloads"
-  map_webarxiv_bbcid_file = "./Sample_ids.txt"
+  map_webarxiv_bbcid_file = "Sample_bbcid.txt"
   
   result_dir = "./xsum-extracts-from-downloads"
   os.system("mkdir -p "+result_dir)
   failed_id_file = open("xsum-extracts-from-downloads-failedIds.txt", "w")
+
 
   # Get all bbcids
   bbcids_dict = {}
   for line in open(map_webarxiv_bbcid_file).readlines():
     data = line.strip().split()
     bbcids_dict[data[1]] = data[0]
-  print("Length of bbcids dictionary: ", len(bbcids_dict))
+  print (len(bbcids_dict))
 
   count = 0
 
@@ -168,17 +235,20 @@ if __name__ == "__main__":
       continue
 
     webarxivid = bbcids_dict[bbcid]
-    downloaded_file = download_dir+"/"+get_download_file_name(webarxivid)
     
+    #print(get_download_file_name(webarxivid))
+    downloaded_file = download_dir+"/"+get_download_file_name(webarxivid)
+    #print(downloaded_file)
     if not os.path.isfile(downloaded_file):
       failed_id_file.write(bbcid+"\tHTML FILE IS NOT YET DOWNLOADED.\n")
       continue
-
+    
     htmldata = open(downloaded_file).read()
     
     # url, corpus, htmldata
     story_title, story_introduction, story_restcontent = GenerateMapper((webarxivid, "bbc", htmldata))
 
+    #print('l',story_introduction.title)
     if not ((len(story_title.title) == 1) and (len(story_introduction.title) == 1) and (len(story_restcontent.restcontent) != 0)):
       failed_id_file.write(bbcid+"\t"+str(len(story_title.title))+"\t"+str(len(story_introduction.title))+
                            "\t"+str(len(story_restcontent.restcontent))+"\n")
