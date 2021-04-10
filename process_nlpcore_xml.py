@@ -5,6 +5,7 @@ import json
 import os
 import xml.etree.ElementTree as ET
 import itertools
+import argparse
 
 def indent(elem, level=0):
   i = "\n" + level*"  "
@@ -23,23 +24,37 @@ def indent(elem, level=0):
 
 if __name__ == "__main__":
 
-  stanford_directory = "./StanfordOutput"
+  parser = argparse.ArgumentParser(description='Parse xml files')
+  parser.add_argument('--stanford_dir', type=str, default="./StanfordOutput")
+  parser.add_argument('--split_dict', type=str, default="new_split.json")
+  parser.add_argument('--output_dir', type=str, default="./xsum-preprocessed")
+  parser.add_argument('--results_dir', type=str, default="./xsum-extracts-from-downloads")
+  args = parser.parse_args()
+
+  stanford_directory = args.stanford_dir
+  split_file = args.split_dict
 
   # Load split file
-  split_dict = json.loads(open("new_split.json").read())
+  split_dict = json.loads(open(split_file).read())
   data_types = ["test", "validation", "train"]
 
-  output_directory = "./xsum-preprocessed"
-  os.system("mkdir -p "+output_directory)
+  output_directory = args.output_dir
+  # TODO: Add if dir does not exist
+  os.mkdir(output_directory)
+  print("op dir created")
+  # os.system("mkdir -p "+output_directory)
 
   count = 1
   for dtype in data_types:
     print(dtype)
     
     # Creating Directories
-    os.system("mkdir -p "+output_directory+"/document")
-    os.system("mkdir -p "+output_directory+"/document-lemma")
-    os.system("mkdir -p "+output_directory+"/summary")
+    # os.system("mkdir -p "+output_directory+"/document")
+    # os.system("mkdir -p "+output_directory+"/document-lemma")
+    # os.system("mkdir -p "+output_directory+"/summary")
+    os.mkdir(output_directory+"/document")
+    os.mkdir(output_directory+"/document-lemma")
+    os.mkdir(output_directory+"/summary")
     
     for orgfileid in split_dict[dtype]:
 
@@ -97,14 +112,12 @@ if __name__ == "__main__":
       summarydata = []
       
       allcovered = 0
-      # print("ALL COVERED IS 0 ")
       for doc_sent, doc_sentlemma in zip(doc_sentences, doc_sentlemmas):
         # print("Pair:", doc_sent, doc_sentlemma)
         if "[ XSUM ] URL [ XSUM ]" in doc_sent:
           modeFlag = "URL"
           allcovered += 1
         elif "[ XSUM ] INTRODUCTION [ XSUM ]" in doc_sent:
-          print("elif", doc_sent)
           modeFlag = "INTRODUCTION"
           allcovered += 1
           summarydata.append(doc_sent[30:]) # Starting after [ XSUM ]
@@ -120,7 +133,7 @@ if __name__ == "__main__":
             # print("intro found")
             summarydata.append(doc_sent)
 
-      # print(allcovered)
+      print("All 3 generated!")
       if allcovered != 3:
         print("Some information missing", stanfordfile)
         # print("\n".join(doc_sentences))
