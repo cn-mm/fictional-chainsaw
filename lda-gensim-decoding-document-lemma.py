@@ -17,9 +17,11 @@ ldadir = "./lda-train-document-lemma-topic-"+str(TOTAL_NUM_TOPICS)+"-iter-"+str(
 corpusdir = "./xsum-preprocessed"
 
 ## Stopwords
-stopwords   = set(nltk.corpus.stopwords.words('english'))
+file_stop=open('/root/nltk_data/corpora/stopwords/english')
+data=file_stop.read()
+stopwords   = set(data)
 # Smart Stopwords
-stopwords = stopwords.union(set([item.strip() for item in open("scripts/smart-stopwords.txt").readlines() if len(item.strip()) != 0]))
+stopwords = stopwords.union(set([item.strip() for item in open("smart-stopwords.txt").readlines() if len(item.strip()) != 0]))
 
 ## Punctuations
 punctuation = string.punctuation
@@ -46,13 +48,13 @@ def documents():
 if __name__ == '__main__':
 
     # Load LDA model
-    print "Loading LDA model from "+ldadir+ "..."
+    print ("Loading LDA model from "+ldadir+ "...")
     lda = gensim.models.ldamulticore.LdaMulticore.load(ldadir+'/lda.model', mmap='r')
 
     outputdir = corpusdir+"/document-lemma-topic-"+str(TOTAL_NUM_TOPICS)+"-iter-"+str(TOTAL_NUM_ITER)
     os.system("mkdir -p "+outputdir)
     
-    print "Start decoding in "+outputdir+"..."
+    print ("Start decoding in "+outputdir+"...")
     count = 0
     for fileid, doc in documents():
 
@@ -61,7 +63,7 @@ if __name__ == '__main__':
 
         bow = lda.id2word.doc2bow(doc)
         # print bow
-        topics = lda.get_document_topics(bow, per_word_topics=True, minimum_probability=None, minimum_phi_value=None)
+        topics = lda.get_document_topics(bow, per_word_topics=True, minimum_probability=0, minimum_phi_value=0)
         
         # topic_dict = {}
         outstr = ""
@@ -75,4 +77,4 @@ if __name__ == '__main__':
 
         count += 1
         if count%10000 == 0:
-            print count
+            print( count)
