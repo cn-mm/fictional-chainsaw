@@ -49,6 +49,7 @@ if __name__ == "__main__":
 
       # print(orgfileid)
       
+      # Directory where xml files are stored 
       stanfordfile = stanford_directory + "/" + orgfileid + ".data.xml"
     
       doc_sentences = []
@@ -81,13 +82,14 @@ if __name__ == "__main__":
                     doc_sentlemmas.append(sent_lem[:pos])
                     doc_sentlemmas.append(sent_lem[pos:])
                 i+=1
-              doc_sentences.append(" ".join(sentence_tokenized))
-              doc_sentlemmas.append(" ".join(sentence_lemmatized))
+              else:
+                doc_sentences.append(" ".join(sentence_tokenized))
+                doc_sentlemmas.append(" ".join(sentence_lemmatized))
               
       # print("S1:",doc_sentences[0])
       # print("S2",doc_sentences[1])
       # print(doc_sentences[2])
-      doc_sentences[2] = ""
+      # doc_sentences[2] = ""
 
       # Extract data
       modeFlag = None
