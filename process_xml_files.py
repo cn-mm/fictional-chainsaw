@@ -85,11 +85,6 @@ if __name__ == "__main__":
               else:
                 doc_sentences.append(" ".join(sentence_tokenized))
                 doc_sentlemmas.append(" ".join(sentence_lemmatized))
-              
-      # print("S1:",doc_sentences[0])
-      # print("S2",doc_sentences[1])
-      # print(doc_sentences[2])
-      # doc_sentences[2] = ""
 
       # Extract data
       modeFlag = None
@@ -124,28 +119,29 @@ if __name__ == "__main__":
       if allcovered != 3:
         print("Some information missing", stanfordfile)
         # print("\n".join(doc_sentences))
-        exit(0)
 
-      # rest body data
-      foutput = open(output_directory+"/document/"+orgfileid+".document", "w")
-      foutput.write("\n".join(restbodydata)+"\n")
-      foutput.close()
-      
-      # rest body lemma data
-      foutput = open(output_directory+"/document-lemma/"+orgfileid+".document-lemma", "w")
-      foutput.write("\n".join(restbodylemmadata)+"\n")
-      foutput.close()
+        # exit(0)
+      else:
+        # rest body data
+        foutput = open(output_directory+"/document/"+orgfileid+".document", "w")
+        foutput.write("\n".join(restbodydata)+"\n")
+        foutput.close()
+        
+        # rest body lemma data
+        foutput = open(output_directory+"/document-lemma/"+orgfileid+".document-lemma", "w")
+        foutput.write("\n".join(restbodylemmadata)+"\n")
+        foutput.close()
 
-      # summary data
-      foutput = open(output_directory+"/summary/"+orgfileid+".summary", "w")
-      foutput.write("\n".join(summarydata)+"\n")
-      foutput.close()
+        # summary data
+        foutput = open(output_directory+"/summary/"+orgfileid+".summary", "w")
+        foutput.write("\n".join(summarydata)+"\n")
+        foutput.close()
+        
+        if count%1000 == 0:
+            print(count)
+        count += 1
+        
+        # exit(0)
       
-      if count%1000 == 0:
-          print(count)
-      count += 1
-      
-      # exit(0)
-    
 
  
