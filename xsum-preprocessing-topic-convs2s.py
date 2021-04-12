@@ -7,23 +7,15 @@ import argparse
 dm_single_close_quote = u'\u2019' 
 dm_double_close_quote = u'\u201d'
 END_TOKENS = ['.', '!', '?', '...', "'", "`", '"', dm_single_close_quote, dm_double_close_quote, ")"] # acceptable ways to end a sentence
-
-# bbc_tokenized_stories_dir = "./XSum-Dataset/xsum-preprocessed"
-
-# finished_files_dir = "./data-topic-convs2s"
-
-# Load JSON File : training, dev and test splits.
-# with open("./XSum-Dataset/XSum-TRAINING-DEV-TEST-SPLIT-90-5-5.json") as json_data:
-# with open("./new_split.json") as json_data:
-#   train_dev_test_dict = json.load(json_data)
-
-# lda_word_topics = "./lda-train-document-lemma-topic-512-iter-1000/word_term_topics.log"
   
 def read_text_file(text_file):
   lines = []
-  with open(text_file, "r") as f:
-    for line in f:
-      lines.append(line.strip())
+  try:
+    with open(text_file, "r") as f:
+      for line in f:
+        lines.append(line.strip())
+  except Exception as e:
+    print(e, " File does not exist") 
   return lines
 
 def fix_missing_period(line):
@@ -82,9 +74,7 @@ def write_to_bin(data_type, out_file_rb, out_file_fs, out_file_doctopics, out_fi
     documentfile = bbc_tokenized_stories_dir + "/document/" + s + ".document"
     summaryfile = bbc_tokenized_stories_dir + "/summary/" + s + ".summary"
     documentfile_lemma = bbc_tokenized_stories_dir + "/document-lemma/" + s + ".document-lemma"
-    # TODO: generate doc topics file 
-    # doctopicfile = bbc_tokenized_stories_dir + "/document-lemma-topic-512-iter-1000/" + s + ".doc-topics"
-    doctopicfile = "/content/fictional-chainsaw/xsum-preprocessed" + "/document-lemma-topic-512-iter-1000/" + s + ".doc-topics"
+    doctopicfile = bbc_tokenized_stories_dir + "/document-lemma-topic-512-iter-1000/" + s + ".doc-topics"
   
             
     # Get the strings to write to .bin file
